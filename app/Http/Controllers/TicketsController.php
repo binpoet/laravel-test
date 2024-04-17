@@ -37,6 +37,10 @@ class TicketsController extends Controller
     public function store(CreateTicketRequest $request)
     {
         $data = $request->validated();
+        /*
+         *todo We don't need to perform validation checks here because any validation errors are handled by the CreateTicketRequest class.
+         */
+
 
         $data['user_id'] = auth()->id();
 
@@ -50,6 +54,7 @@ class TicketsController extends Controller
      */
     public function show(string $id)
     {
+        //todo  Ensure ID is defined as an integer in models and use appropriate type hinting.
         $ticket = Ticket::with('user', 'responses')->findOrFail($id);
         return inertia('Tickets/Show', [
             'ticket' => $ticket,
@@ -77,8 +82,12 @@ class TicketsController extends Controller
      */
     public function destroy(string $id)
     {
+        //todo We should check owner of ticket with auth user before any deleting and id should be int
+
         $ticket = Ticket::findOrFail($id);
         $ticket->delete();
+        //todo REST API endpoints should return appropriate HTTP status codes and messages instead of performing redirects.
+
         return redirect()->route('tickets.index');
     }
 }

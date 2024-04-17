@@ -29,6 +29,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        //todo  Hash passwords before saving to the database, preferably in the model layer.
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
@@ -45,12 +46,15 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        //todo For account deletion, implement a request form and compare the current password with the user's password before proceeding with deletion.
+
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
 
+        //todo It's redundant.
         Auth::logout();
 
         $user->delete();

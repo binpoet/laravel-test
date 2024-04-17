@@ -12,7 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Ticket extends Model
 {
     use HasFactory;
-
+    /*
+     *todo make fillable user_id or status can lead to security issue.
+     * Avoid adding sensitive fields directly to the fillable array in Laravel models to prevent mass assignment vulnerabilities.
+     */
     protected $fillable = [
         'user_id',
         'title',

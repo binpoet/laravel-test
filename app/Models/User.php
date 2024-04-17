@@ -23,6 +23,12 @@ class User extends Authenticatable
         'role',
     ];
 
+    //todo Avoid adding sensitive fields directly to the fillable array in Laravel models to prevent mass assignment vulnerabilities. role is a sensitive field.
+    /*
+     * todo
+        In Laravel models, particularly for sensitive or calculated fields, it's often wise not to include them in the fillable array to prevent mass assignment vulnerabilities or unintended overwriting of their values.
+     */
+
     /**
      * The attributes that should be hidden for serialization.
      *
