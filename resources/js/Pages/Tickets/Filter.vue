@@ -38,7 +38,7 @@ const clear = () => {
     <form @submit.prevent="filter" class="flex justify-center">
         <div class="mb-8 mt-4 flex flex-wrap gap-2">
             <div class="flex flex-nowrap items-center">
-                <input v-model="filterForm.searchInput" type="text" placeholder="search" class="w-50" />
+                <input v-model="filterForm.searchInput" type="text" placeholder="Search" class="w-50" />
             </div>
 
             <div class="flex flex-nowrap items-center">
@@ -54,7 +54,7 @@ const clear = () => {
             </div>
 
             <div class="flex flex-nowrap items-center">
-                <VueDatePicker v-model="filterForm.date" range class="w-50"></VueDatePicker>
+                <VueDatePicker v-model="filterForm.date" :enable-time-picker="false" range class="w-50"></VueDatePicker>
             </div>
 
             <button type="submit"
