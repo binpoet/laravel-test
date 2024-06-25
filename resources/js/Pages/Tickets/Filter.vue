@@ -34,33 +34,68 @@ const clear = () => {
 }
 
 </script>
-<template>
-    <form @submit.prevent="filter" class="flex justify-center">
-        <div class="mb-8 mt-4 flex flex-wrap gap-2">
-            <div class="flex flex-nowrap items-center">
-                <input v-model="filterForm.searchInput" type="text" placeholder="Search" class="w-50" />
-            </div>
 
-            <div class="flex flex-nowrap items-center">
-                <select v-model="filterForm.priority" class="input-filter-l w-28">
+<template>
+    <form @submit.prevent="filter" class="flex flex-col w-full">
+        <div class="mb-4 mt-4 grid gap-2 w-full md:grid-cols-4 sm:grid-cols-2 grid-cols-1">
+            <div class="form-element">
+                <input v-model="filterForm.searchInput" type="text" placeholder="Search" class="input-element" />
+            </div>
+            <div class="form-element">
+                <select v-model="filterForm.priority" class="input-element">
                     <option :value="null">Priority</option>
-                    <option v-for="(priority, label) in priorities" :value="priority">{{ label }}
-                    </option>
+                    <option v-for="(priority, label) in priorities" :value="priority">{{ label }}</option>
                 </select>
-                <select v-model="filterForm.status" class="input-filter-r w-28">
+            </div>
+            <div class="form-element">
+                <select v-model="filterForm.status" class="input-element">
                     <option :value="null">Status</option>
                     <option v-for="(status, label) in statuses" :value="status">{{ label }}</option>
                 </select>
             </div>
-
-            <div class="flex flex-nowrap items-center">
-                <VueDatePicker v-model="filterForm.date" :enable-time-picker="false" range class="w-50"></VueDatePicker>
+            <div class="form-element">
+                <VueDatePicker v-model="filterForm.date" :enable-time-picker="false" range class="datepicker"></VueDatePicker>
             </div>
-
-            <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Filter</button>
-            <button @click="clear" type="reset"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Clear</button>
+        </div>
+        <div class="flex justify-end gap-2 mb-8">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-6 rounded">Filter</button>
+            <button @click="clear" type="reset" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-6 rounded">Clear</button>
         </div>
     </form>
 </template>
+
+<style scoped>
+.grid {
+    display: grid;
+    gap: 8px;
+}
+
+.form-element {
+    display: flex;
+    align-items: center;
+    height: 38px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-element {
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.datepicker {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.datepicker .dp__input {
+    width: 100%;
+    height: 38px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+</style>
