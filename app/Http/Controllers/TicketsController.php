@@ -6,6 +6,7 @@ use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Http\Requests\Tickets\CreateTicketRequest;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TicketsController extends Controller
@@ -29,9 +30,12 @@ class TicketsController extends Controller
 
         // If search input is provided, Laravel Scout used to search
         if ($filters['searchInput'] ?? false) {
-
-            $searchQuery = Ticket::search($filters['searchInput'])->query(function ($query) {
-                $query->join('users', 'tickets.user_id', '=', 'users.id');
+            $searchInput = $filters['searchInput'];
+            $searchQuery = Ticket::search($searchInput)->query(function ($query) use ($searchInput) {
+                $query->join('users', 'tickets.user_id', '=', 'users.id')
+                      ->select(['tickets.id as id', 'tickets.user_id', 'tickets.title', 'tickets.description'])
+                      ->orWhere('tickets.title', 'like', '%' . $searchInput . '%')
+                      ->orWhere('tickets.description', 'like', '%' . $searchInput . '%');
             });
             $searchResults = $searchQuery->get()->pluck('id');
         }
@@ -47,7 +51,12 @@ class TicketsController extends Controller
             )
             ->when(
                 $filters['date'] ?? false,
-                fn ($query, $value) => $query->whereBetween('created_at', $value)
+                function ($query, $value) {
+                    $startDate = Carbon::parse($value[0])->startOfDay();
+                    $endDate = isset($value[1]) && $value[1] ? Carbon::parse($value[1])->endOfDay() : $startDate->endOfDay();
+                
+                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                }
             )
             ->when(
                 $searchResults ?? false,
