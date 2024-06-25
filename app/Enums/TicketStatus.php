@@ -11,9 +11,9 @@ enum TicketStatus: string
     public static function toSelectArray(): array
     {
         return [
-            self::Open->value => self::Open->name,
-            self::InProgress->value => self::InProgress->name,
-            self::Closed->value => self::Closed->name,
+            self::Open->name => self::Open->value,
+            self::InProgress->name => self::InProgress->value,
+            self::Closed->name => self::Closed->value,
         ];
     }
 }

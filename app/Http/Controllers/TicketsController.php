@@ -13,13 +13,53 @@ class TicketsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Get Priority and status filter options
+        $priorities = TicketPriority::toSelectArray();
+        $statuses = TicketStatus::toSelectArray();
+
+        // Get default 10 items if per_page parameter is empty
+        $perPage = $request->input('per_page') ?? 10;
+
+        // Filters query params
+        $filters = $request->only([
+            'searchInput', 'status', 'priority', 'date'
+        ]);
+
+        // If search input is provided, Laravel Scout used to search
+        if ($filters['searchInput'] ?? false) {
+
+            $searchQuery = Ticket::search($filters['searchInput'])->query(function ($query) {
+                $query->join('users', 'tickets.user_id', '=', 'users.id');
+            });
+            $searchResults = $searchQuery->get()->pluck('id');
+        }
+
         $tickets = Ticket::with('user')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->when(
+                $filters['priority'] ?? false,
+                fn ($query, $value) => $query->where('priority', $value)
+            )
+            ->when(
+                $filters['status'] ?? false,
+                fn ($query, $value) => $query->where('status', $value)
+            )
+            ->when(
+                $filters['date'] ?? false,
+                fn ($query, $value) => $query->whereBetween('created_at', $value)
+            )
+            ->when(
+                $searchResults ?? false,
+                fn ($query, $value) => $query->whereIn('id', $value)
+            )
+            ->paginate($perPage)->withQueryString();
+
         return inertia('Tickets/Index', [
             'tickets' => $tickets,
+            'priorities' => $priorities,
+            'statuses' => $statuses,
+            'filters' => $filters,
         ]);
     }
 
@@ -28,7 +68,13 @@ class TicketsController extends Controller
      */
     public function create()
     {
-        return inertia('Tickets/CreateTicket');
+        $priorities = TicketPriority::toSelectArray();
+        $statuses = TicketStatus::toSelectArray();
+
+        return inertia('Tickets/CreateTicket', [
+            'priorities' => $priorities,
+            'statuses' => $statuses,
+        ]);
     }
 
     /**
@@ -37,10 +83,6 @@ class TicketsController extends Controller
     public function store(CreateTicketRequest $request)
     {
         $data = $request->validated();
-        /*
-         *todo We don't need to perform validation checks here because any validation errors are handled by the CreateTicketRequest class.
-         */
-
 
         $data['user_id'] = auth()->id();
 
@@ -54,7 +96,6 @@ class TicketsController extends Controller
      */
     public function show(string $id)
     {
-        //todo  Ensure ID is defined as an integer in models and use appropriate type hinting.
         $ticket = Ticket::with('user', 'responses')->findOrFail($id);
         return inertia('Tickets/Show', [
             'ticket' => $ticket,
@@ -82,12 +123,8 @@ class TicketsController extends Controller
      */
     public function destroy(string $id)
     {
-        //todo We should check owner of ticket with auth user before any deleting and id should be int
-
         $ticket = Ticket::findOrFail($id);
         $ticket->delete();
-        //todo REST API endpoints should return appropriate HTTP status codes and messages instead of performing redirects.
-
         return redirect()->route('tickets.index');
     }
 }

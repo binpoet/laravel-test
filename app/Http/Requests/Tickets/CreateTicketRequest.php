@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\Tickets;
 
+use App\Enums\TicketStatus;
+use App\Enums\TicketPriority;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateTicketRequest extends FormRequest
@@ -24,18 +27,17 @@ class CreateTicketRequest extends FormRequest
         $this->checkStatus();
 
         return [
-            'title' => 'required',
-            'description' => 'required',
-            'priority' => 'required',
-            'status' => 'required',
+            'title' => 'required|string|min:5|max:255',
+            'description' => 'required|string|min:10|max:1000',
+            'priority' => ['required', Rule::in(TicketPriority::toSelectArray())],
+            'status' => ['required', Rule::in(TicketStatus::toSelectArray())],
         ];
     }
 
     protected function checkStatus(): void
     {
-        if($this->status == 'open') {
+        if ($this->status == 'open') {
             $this->merge(['priority' => 'medium']);
         }
-
     }
 }

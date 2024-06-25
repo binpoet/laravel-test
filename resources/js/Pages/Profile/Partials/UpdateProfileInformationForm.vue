@@ -33,7 +33,6 @@ const form = useForm({
         </header>
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
-            <!-- todo  Include CSRF token protection in forms to prevent CSRF attacks.-->
             <div>
                 <InputLabel for="name" value="Name" />
 

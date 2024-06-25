@@ -8,14 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 class Ticket extends Model
 {
-    use HasFactory;
-    /*
-     *todo make fillable user_id or status can lead to security issue.
-     * Avoid adding sensitive fields directly to the fillable array in Laravel models to prevent mass assignment vulnerabilities.
-     */
+    use HasFactory, Searchable;
+
     protected $fillable = [
         'user_id',
         'title',
@@ -37,5 +35,15 @@ class Ticket extends Model
     public function responses(): HasMany
     {
         return $this->hasMany(Response::class);
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'title' => '',
+            'description' => '',
+            'users.name' => '',
+            'users.email' => '',
+        ];
     }
 }

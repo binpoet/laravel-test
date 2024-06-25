@@ -1,11 +1,12 @@
-export default class DateFormatter {
-    static formatDate(date, locale = 'en-US', options = {}) {
-        options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            ...options,
-        };
-        return new Intl.DateTimeFormat(locale, options).format(new Date(date));
-    }
-}
+export default {
+    formatDate(date, options = { year: 'numeric', month: 'long', day: 'numeric' }, locale = 'en-US') {
+      try {
+        const formattedDate = new Date(date).toLocaleDateString(locale, options);
+        return formattedDate;
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return 'Invalid Date';
+      }
+    },
+  };
+
